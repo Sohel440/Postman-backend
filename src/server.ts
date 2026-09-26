@@ -5,11 +5,28 @@ import cors from "cors";
 dotenv.config();
 
 const app = express();
+const allowedOrigins = [
+  "http://localhost:5173",
+  "http://localhost:3000",
+  "https://postman-frontend-omega.vercel.app"
+];
+
 app.use(cors({
-  origin: ["http://localhost:5173", "https://postman-frontend-omega.vercel.app"],
+  origin: (origin, callback) => {
+    // Allow requests with no origin (like mobile apps, curl, Postman)
+    if (!origin) return callback(null, true);
+    if (
+      allowedOrigins.includes(origin) ||
+      origin.endsWith(".vercel.app")
+    ) {
+      return callback(null, true);
+    }
+    return callback(null, true);
+  },
   credentials: true,
-  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization"]
+  methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With", "Accept"],
+  optionsSuccessStatus: 200
 }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -38,3 +55,5 @@ app.use(errorHandler);
 app.listen(PORT, () => {
   console.log(`Server connected at : Port -> ${PORT}`);
 });
+
+export default app;
