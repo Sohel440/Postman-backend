@@ -1,0 +1,98 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/client"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id           String        @id @default(uuid())
+  name         String
+  email        String        @unique
+  password     String
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  collections  Collection[]
+  environments Environment[]
+  histories    History[]
+}
+
+model Collection {
+  id          String    @id @default(uuid())
+  userId      String
+  name        String
+  description String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  folders     Folder[]
+  requests    Request[]
+
+  @@index([userId])
+}
+
+model Folder {
+  id           String     @id @default(uuid())
+  collectionId String
+  name         String
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  collection   Collection @relation(fields: [collectionId], references: [id], onDelete: Cascade)
+  requests     Request[]
+
+  @@index([collectionId])
+}
+
+model Request {
+  id            String     @id @default(uuid())
+  collectionId  String
+  folderId      String?
+  name          String
+  method        String
+  url           String
+  queryParams   Json?
+  headers       Json?
+  authorization Json?
+  body          Json?
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+  histories     History[]
+  collection    Collection @relation(fields: [collectionId], references: [id], onDelete: Cascade)
+  folder        Folder?    @relation(fields: [folderId], references: [id])
+
+  @@index([collectionId])
+  @@index([folderId])
+}
+
+model Environment {
+  id        String   @id @default(uuid())
+  userId    String
+  name      String
+  variables Json?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model History {
+  id              String   @id @default(uuid())
+  userId          String
+  requestId       String?
+  method          String
+  url             String
+  status          Int?
+  responseTime    Int?
+  responseSize    Int?
+  responseHeaders Json?
+  responseBody    Json?
+  createdAt       DateTime @default(now())
+  request         Request? @relation(fields: [requestId], references: [id])
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([requestId])
+}
