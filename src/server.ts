@@ -17,6 +17,10 @@ import { errorHandler } from "./middlewares/error.middleware.js";
 const PORT = process.env.PORT || 3000;
 console.log(PORT);
 
+app.get("/", (req, res) => {
+  res.send("Hello World!");
+});
+
 app.use("/api/auth", authRoutes);
 app.use("/api/collection", collectionRouter);
 app.use("/api/requests", requestRouter);
