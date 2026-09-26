@@ -6,7 +6,8 @@
   "type": "module",
   "scripts": {
     "dev": "tsx watch src/server.ts",
-    "build": "tsc",
+    "build": "prisma generate && tsc && node -e \"require('node:fs').cpSync('src/generated/client', 'dist/generated/client', { recursive: true })\"",
+    "prestart": "npm run build",
     "start": "node dist/server.js"
   },
   "keywords": [],
