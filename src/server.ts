@@ -18,7 +18,7 @@ const PORT = process.env.PORT || 3000;
 console.log(PORT);
 
 app.get("/", (req, res) => {
-  res.send("Hello World!");
+  res.send({message: "Hello World!"});
 });
 
 app.use("/api/auth", authRoutes);
